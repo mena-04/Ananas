@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Local AI Chatbot</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    #chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+    .bot { color: green; margin-bottom: 10px; }
+    .user { color: blue; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Chat with Local AI</h2>
+<div id="chat"></div>
+
+<input id="input" type="text" placeholder="Type a message..." style="width: 80%;">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+  async function sendMessage() {
+    const input = document.getElementById('input');
+    const chat = document.getElementById('chat');
+    const userMessage = input.value;
+    input.value = '';
+
+    chat.innerHTML += `<div class="user"><strong>You:</strong> ${userMessage}</div>`;
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'mistral',
+        prompt: userMessage,
+        stream: false
+      })
+    });
+
+    const data = await response.json();
+    chat.innerHTML += `<div class="bot"><strong>AI:</strong> ${data.response}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
